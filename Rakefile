@@ -74,7 +74,6 @@ end
 namespace :hookify do
   
   task :pre_commit do
-    raise "I am not compressible yet!!"
   end
   
 end#
