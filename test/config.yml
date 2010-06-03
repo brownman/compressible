@@ -1,0 +1,11 @@
+js:
+  paths:
+    - test/test-a.js
+    - test/test-b.js
+  to: test/result.js
+  munge: true
+css:
+  paths:
+    - test/test-a.css
+    - test/test-b.css
+  to: test/result.css
