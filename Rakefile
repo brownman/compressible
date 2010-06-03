@@ -69,7 +69,7 @@ end
 
 namespace :hookify do
   
-  task :pre_release do
+  task :pre_receive do
     raise "I am not compressible yet!"
   end
   
