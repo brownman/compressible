@@ -22,12 +22,13 @@ class Compressible
     end
     
     # called if you gave it a config
-    def compress
+    def compress(value = nil)
+      configure(value) if value
       raise "set config to yaml file or run 'Compressible.js' or 'Compressible.css' manually" unless @config
       
       config.each do |k, v|
         args = v.delete(:paths) + [v]
-        self.class.send(k, *args)
+        self.send(k, *args)
       end
     end
     
