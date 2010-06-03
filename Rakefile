@@ -67,6 +67,10 @@ task :yank do
   `gem yank #{spec.name} -v #{spec.version}`
 end
 
+task :lance do
+  puts "LANCE POLARd"
+end
+
 namespace :hookify do
   
   task :pre_commit do
