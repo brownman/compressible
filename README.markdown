@@ -96,6 +96,30 @@ To tell it you want to use the cached in a different environment, you can specif
 
     compressible_stylesheet_tag("production_cache", :environments => ["production", "staging"])
 
-## Asset loading performance
+## Awesome Assets for Heroku
 
-http://www.ridingtheclutch.com/2009/07/13/the-ultimate-ruby-performance-test-part-1.html
+Because Heroku is a Read-Only file system, you can't use Rails' built in asset cacher, or libraries like `asset_packager`.  They rely on the ability to write to the file system in the production environment.
+
+Some libraries solve this by patching `asset_packager` to redirect css/js urls to the `/tmp` directory using Rack middleware.  The `/tmp` directory is about the only place Heroku lets you write to the file system in.  The main issue with this approach is that all requests for stylesheets and javascripts must pass through Rack, which potentially _doubles_ response time.  Take a look at the [asset loading performance comparison in with different Ruby stacks](http://www.ridingtheclutch.com/2009/07/13/the-ultimate-ruby-performance-test-part-1.html).
+
+As such, Compressible compresses all assets before you push to Heroku, so a) you never write to the Heroku file system, and b) you don't have slow down the request with application or middleware layers.  It does this with _git hooks_.  Every time you commit, a `pre-commit` hook runs which re-compresses your assets.  That means whenever you push, your assets are ready for production.
+
+This is configurable.  It relies on the [`hookify`](http://github.com/viatropos/hookify) gem.
+
+    sudo gem install hookify
+    cd my-rails-app
+    hookify pre-commit
+    
+That creates a ruby script for you were you can define what you want to run when.  In our case, we want to run:
+
+    Compressible.assets(
+      :stylesheets => {
+        :production_cache => %w(reset background footer list),
+        :typography => %w(forms headers basic_text)
+      }
+      :javascripts => {
+        :production_cache => %w(animations effects dragdrop)
+      }
+    )
+    
+Very cool.
