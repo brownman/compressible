@@ -87,20 +87,20 @@ You can then setup everything with `configure`:
 
 Add this to your views:
 
-    compressible_stylesheet_tag("production_cache", "typography")
-    compressible_javascript_tag("production_cache")
+    compressible_stylesheet_tag "production_cache", "typography"
+    compressible_javascript_tag "production_cache"
 
 By default, it will use non-compressed stylesheets when `Rails.env == "development"`, and the compressed stylesheets when `Rails.env == "production"`.
 
 To tell it you want to use the cached in a different environment, you can specify it like this:
 
-    compressible_stylesheet_tag("production_cache", :environments => ["production", "staging"])
+    compressible_stylesheet_tag "production_cache", :environments => ["production", "staging"]
 
 ## Awesome Assets for Heroku
 
 Because Heroku is a Read-Only file system, you can't use Rails' built in asset cacher, or libraries like `asset_packager`.  They rely on the ability to write to the file system in the production environment.
 
-Some libraries solve this by patching `asset_packager` to redirect css/js urls to the `/tmp` directory using Rack middleware.  The `/tmp` directory is about the only place Heroku lets you write to the file system in.  The main issue with this approach is that all requests for stylesheets and javascripts must pass through Rack, which potentially _doubles_ response time.  Take a look at the [asset loading performance comparison in with different Ruby stacks](http://www.ridingtheclutch.com/2009/07/13/the-ultimate-ruby-performance-test-part-1.html).
+Some libraries solve this by patching `asset_packager` to redirect css/js urls to the `/tmp` directory using Rack middleware.  The `/tmp` directory is about the only place Heroku lets you write to the file system in.  The main issue with this approach is that all requests for stylesheets and javascripts must pass through Rack, which potentially _doubles_ response time.  Take a look at the [asset loading performance comparison with different Ruby stacks](http://www.ridingtheclutch.com/2009/07/13/the-ultimate-ruby-performance-test-part-1.html).
 
 As such, Compressible compresses all assets before you push to Heroku, so a) you never write to the Heroku file system, and b) you don't have slow down the request with application or middleware layers.  It does this with _git hooks_.  Every time you commit, a `pre-commit` hook runs which re-compresses your assets.  That means whenever you push, your assets are ready for production.
 
@@ -109,17 +109,25 @@ This is configurable.  It relies on the [`hookify`](http://github.com/viatropos/
     sudo gem install hookify
     cd my-rails-app
     hookify pre-commit
+    mate config/hooks/pre_commit.rb
     
-That creates a ruby script for you were you can define what you want to run when.  In our case, we want to run:
+That creates a ruby script for you were you can define what you want to run when.  Add this to the `config/hooks/pre_commit.rg` file:
 
-    Compressible.assets(
-      :stylesheets => {
-        :production_cache => %w(reset background footer list),
-        :typography => %w(forms headers basic_text)
-      }
-      :javascripts => {
-        :production_cache => %w(animations effects dragdrop)
-      }
+    require 'rubygems'
+    gem "activesupport", "= 2.3.5"
+    require "active_support"
+    require 'compressible'
+
+    Compressible.configure(
+      :stylesheet_path => "public/stylesheets",
+      :javascript_path => "public/javascripts"
+    )
+
+    Compressible.stylesheets(
+      :production_cache => %w(reset background footer list)
+    )
+    Compressible.javascripts(
+      :production_cache => %w(interface jquery.anytime)
     )
     
-Very cool.
+Now stylesheets and javascripts compress using the YUICompressor every time you commit.  And it's fast.  Very cool.

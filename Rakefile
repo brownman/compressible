@@ -6,10 +6,11 @@ require 'rake/gempackagetask'
 spec = Gem::Specification.new do |s|
   s.name              = "compressible"
   s.version           = "0.0.2"
-  s.summary           = "Compressible: Quick asset compression for Ruby"
+  s.author            = "Lance Pollard"
+  s.summary           = "Compressible: Quick asset compression for Ruby - Perfect for Heroku"
   s.homepage          = "http://github.com/viatropos/compressible"
   s.email             = "lancejpollard@gmail.com"
-  s.description       = "Quick asset compression for Ruby"
+  s.description       = "Quick asset compression for Ruby - Perfect for Heroku"
   s.has_rdoc          = true
   s.rubyforge_project = "compressible"
   s.platform          = Gem::Platform::RUBY
@@ -65,10 +66,6 @@ end
 
 task :yank do
   `gem yank #{spec.name} -v #{spec.version}`
-end
-
-task :lance do
-  puts "LANCE POLARd"
 end
 
 namespace :hookify do
