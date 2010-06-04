@@ -5,7 +5,7 @@ require 'rake/gempackagetask'
 # http://docs.rubygems.org/read/chapter/20
 spec = Gem::Specification.new do |s|
   s.name              = "compressible"
-  s.version           = "0.0.1"
+  s.version           = "0.0.1.1"
   s.summary           = "Compressible: Quick asset compression for Ruby"
   s.homepage          = "http://github.com/viatropos/compressible"
   s.email             = "lancejpollard@gmail.com"
@@ -17,6 +17,11 @@ spec = Gem::Specification.new do |s|
   s.require_path      = "lib"
   s.add_dependency("activesupport", ">= 2.1.2")
   s.add_dependency("yui-compressor")
+end
+
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.gem_spec    = spec
+  pkg.package_dir = "pkg"
 end
 
 desc "Create .gemspec file (useful for github)"
@@ -43,11 +48,6 @@ task :manifest do
       f.puts file
     end
   end
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec    = spec
-  pkg.package_dir = "pkg"
 end
 
 desc "Install the gem locally"
