@@ -44,10 +44,6 @@ module Compressible
         assets
       end
 
-      def read(type, from)
-        IO.read(path_for(type, from))
-      end
-
       def asset_name(path)
         result = path.to_s.split(".")
         if result.last =~ /(js|css)/
@@ -73,6 +69,24 @@ module Compressible
         path << ".#{KEYS[type].to_s}" unless path.split(".").last == KEYS[type].to_s
 
         path
+      end
+      
+      def size(type, *paths)
+        result = paths.collect { |path| File.size(path_for(type, path)) }.inject(0) { |sum, x| sum + x }
+        by = "kb"
+        unless result <= 0
+          result = case by
+          when "kb"
+            result / 1_000
+          when "mb"
+            result / 1_000_000
+          end
+        end
+        return "#{result.to_s}#{by}"
+      end
+      
+      def read(type, from)
+        IO.read(path_for(type, from))
       end
     end
     

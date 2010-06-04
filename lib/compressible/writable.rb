@@ -28,44 +28,50 @@ module Compressible
       def write_javascript(*args)
         paths = args.dup
         options = paths.extract_options!
-        to = asset_name(options[:to])
-        require 'yui/compressor' unless defined?(YUI)
-
-        munge = options.has_key?(:munge) ? options[:munge] : true
-
-        compressor = YUI::JavaScriptCompressor.new(:munge => munge)
-
-        result = paths.collect do |path|
-          puts "Compressing #{path}..."
-          compressor.compress(read(:javascript, path))
-        end.join("\n\n")
-
-        write(:javascript, to, result) if to
-
-        result
+        options[:to] = asset_name(options[:to])
+        options[:munge] = options.has_key?(:munge) ? options[:munge] : true
+        paths << options
+        process(:javascript, *paths)
       end
       
       def write_stylesheet(*args)
         paths = args.dup
         options = paths.extract_options!
-        to = asset_name(options[:to])
-
-        add_to_config(:css, to, paths)
-
-        return if options[:read_only] == true
-    
-        require 'yui/compressor' unless defined?(YUI)
-
-        compressor = YUI::CssCompressor.new
-
-        result = paths.collect do |path|
-          puts "Compressing #{path}..."
-          compressor.compress(read(:stylesheet, path))
+        options[:to] = asset_name(options[:to])
+        paths << options
+        process(:stylesheet, *paths)
+      end
+      
+      def process(type, *paths)
+        require 'yui/compressor' unless defined?(::YUI)
+        options = paths.extract_options!
+        to      = options[:to]
+        
+        raise 'must define result file name via :to => name' unless to
+        
+        compressor = compressor_for(type, options)
+        
+        start_size = size(type, *paths)
+        
+        compressed = paths.collect do |path|
+          puts "Compressing '#{path}'... (#{size(type, path)})"
+          compressor.compress(read(type, path))
         end.join("\n\n")
-
-        write(:stylesheet, to, result) if to
-
-        result
+        
+        write(type, to, compressed)
+        
+        end_size = size(type, to)
+        
+        puts "Compressed to '#{to.to_s}' (#{end_size} from #{start_size})"
+        
+        compressed
+      end
+      
+      def compressor_for(type, options = {})
+        {
+          :javascript => YUI::JavaScriptCompressor,
+          :stylesheet => YUI::CssCompressor
+        }[type].new(options.reject {|k,v| k.to_s !~ /(munge|charset|linebreak|optimize|preserve_semicolons)/})
       end
       
       def write(type, to, result)
