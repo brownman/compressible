@@ -6,6 +6,8 @@ Ready-to-go Asset Compression for Ruby, using the YUICompressor.
     
 # Usage
 
+## Configuration
+
 There are a few ways you can configure this
 
 ### 1. Initializers
@@ -80,6 +82,19 @@ You can specify these same configuration options using Yaml:
 You can then setup everything with `configure`:
 
     Compressible.configure("config/compressible.yml") # or pass it the yaml hash
+    
+## Views
+
+Add this to your views:
+
+    compressible_stylesheet_tag("production_cache", "typography")
+    compressible_javascript_tag("production_cache")
+
+By default, it will use non-compressed stylesheets when `Rails.env == "development"`, and the compressed stylesheets when `Rails.env == "production"`.
+
+To tell it you want to use the cached in a different environment, you can specify it like this:
+
+    compressible_stylesheet_tag("production_cache", :environments => ["production", "staging"])
 
 ## Asset loading performance
 

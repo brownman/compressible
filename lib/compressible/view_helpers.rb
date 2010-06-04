@@ -1,17 +1,17 @@
 module Compressible::ViewHelpers
   
   def compressible_stylesheet_tag(*keys)
-    Compressible.assets_for(:stylesheet, *keys).each do |asset|
-      stylesheet_include_tag(Compressible.path_for(asset))
-    end
+    Compressible.stylesheets_for(*keys).collect do |asset|
+      stylesheet_link_tag(asset)
+    end.join("\n").html_safe
   end
   
   def compressible_javascript_tag(*keys)
-    Compressible.assets_for(:javascript, *keys).each do |asset|
-      javascript_include_tag(Compressible.path_for(asset))
-    end
+    Compressible.javascripts_for(*keys).collect do |asset|
+      javascript_include_tag(asset)
+    end.join("\n").html_safe
   end
   
 end
 
-# ActionView::Helpers.send(:include, Compressible::ViewHelpers) if defined?(ActionView)
+ActionView::Base.send(:include, Compressible::ViewHelpers) if defined?(ActionView)

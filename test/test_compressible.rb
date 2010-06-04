@@ -101,6 +101,22 @@ class CompressibleTest < Test::Unit::TestCase
         
       end
       
+      teardown { Compressible.reset }
+      
+    end
+    
+    context "without yaml config" do
+      
+      setup { Compressible.reset }
+      
+      should "add javascript to the config hash" do
+        assert_equal [], Compressible.config[:js]
+        Compressible.js("test/test-a", "test/test-b", :to => "test/result")
+        assert_equal ["test/test-a", "test/test-b"], Compressible.config[:js][0][:paths]
+      end
+      
+      teardown { Compressible.reset }
+      
     end
     
     
