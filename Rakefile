@@ -5,7 +5,7 @@ require 'rake/gempackagetask'
 # http://docs.rubygems.org/read/chapter/20
 spec = Gem::Specification.new do |s|
   s.name              = "compressible"
-  s.version           = "0.0.1.1"
+  s.version           = "0.0.1"
   s.summary           = "Compressible: Quick asset compression for Ruby"
   s.homepage          = "http://github.com/viatropos/compressible"
   s.email             = "lancejpollard@gmail.com"
