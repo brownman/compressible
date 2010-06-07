@@ -53,7 +53,7 @@ end
 
 desc "Install the gem locally"
 task :install => [:package] do
-  sh %{sudo gem install pkg/#{spec.name}-#{spec.version} --no-ri --no-rdoc}
+  sh %{gem install pkg/#{spec.name}-#{spec.version} --no-ri --no-rdoc}
 end
 
 desc "Generate the rdoc"

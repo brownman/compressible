@@ -6,8 +6,8 @@ class CompressibleTest < Test::Unit::TestCase
     
     context "configuration" do
             
-      should "load configuration file and result should be a hash" do
-        assert_kind_of Hash, Compressible.configure("test/config.yml")
+      should "load configuration file and result should be a Module" do
+        assert_kind_of Module, Compressible.configure("test/config.yml")
       end
       
       should "raise an RuntimeError if pass junk to config" do
@@ -113,6 +113,17 @@ class CompressibleTest < Test::Unit::TestCase
         assert_equal [], Compressible.config[:js]
         Compressible.js("test/test-a", "test/test-b", :to => "test/result")
         assert_equal ["test/test-a", "test/test-b"], Compressible.config[:js][0][:paths]
+      end
+      
+      should "be able to add config dynamically" do
+        assert_equal Compressible.defaults, Compressible.config
+        Compressible.configure(:stylesheet_path => "public/stylesheets", :read_only => true)
+        assert_equal "public/stylesheets", Compressible.config[:stylesheet_path]
+        Compressible.stylesheets("test/result" => ["test/test-a", "test/test-b"])
+        assets = Compressible.assets_for(:stylesheet, 'test/result', :environments => "production", :current => "development")
+        assert_equal ["test/test-a", "test/test-b"], assets
+        result = {:js=>[], :javascript_path=>nil, :stylesheet_path=>"public/stylesheets", :read_only=>true, :css=>[{:paths=>["test/test-a", "test/test-b"], :to=>"test/result"}]}
+        assert_equal result, Compressible.config
       end
       
       teardown { Compressible.reset }

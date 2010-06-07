@@ -6,7 +6,7 @@ module Compressible
     end
     
     module ClassMethods
-  
+    
       def javascripts(hash)
         hash.each do |to, paths|
           paths << {:to => to}
@@ -27,10 +27,7 @@ module Compressible
         paths = args.dup
         options = paths.extract_options!
         to = asset_name(options[:to])
-        raise "Please define a name for the cached javascript using ':to => :my_name'" unless to
-
         add_to_config(:js, to, paths)
-        
         write_javascript(*args) unless config[:read_only] == true
       end
       alias_method :add_javascript, :javascript

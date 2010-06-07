@@ -10,17 +10,15 @@ module Compressible
 
       def configure(value = nil)
         raise "invalid config" unless (value.is_a?(String) || value.is_a?(Hash))
-        @config = value.is_a?(String) ? YAML.load_file(value) : value
-        @config.recursively_symbolize_keys!
-
-        @config = defaults.merge(@config)
+        
+        config.merge!((value.is_a?(String) ? YAML.load_file(value) : value).recursively_symbolize_keys!)
 
         # normalize everything to an array
         [:js, :css].each do |type|
-          @config[type] = [@config[type]] unless @config[type].is_a?(Array)
+          config[type] = [config[type]] unless config[type].is_a?(Array)
         end
-
-        @config
+        
+        self
       end
 
       def defaults
@@ -36,13 +34,14 @@ module Compressible
       def config
         @config ||= defaults
       end
-
+      
       def add_to_config(type, key, value)
+        raise "Please define a name for the cached #{type.to_s} using ':to => :my_name'" unless key
         item = find_or_create(type, key)
         item[:paths] = value.collect {|i| asset_name(i)}
         item
       end
-
+      
       def find_or_create(type, key)
         result = config[type].detect {|i| i[:to].to_s == key.to_s}
         unless result
@@ -54,6 +53,10 @@ module Compressible
 
       def reset
         @config = defaults
+      end
+      
+      def inspect
+        "<#Compressible @config=#{config.inspect}/>"
       end
     end
     
