@@ -20,6 +20,10 @@ module Compressible
         
         self
       end
+      
+      def define!(*args, &block)
+        Compressible::Builder.define!(*args, &block)
+      end
 
       def defaults
         {
@@ -38,7 +42,7 @@ module Compressible
       def add_to_config(type, key, value)
         raise "Please define a name for the cached #{type.to_s} using ':to => :my_name'" unless key
         item = find_or_create(type, key)
-        item[:paths] = value.collect {|i| asset_name(i)}
+        item[:paths] = value.flatten.collect {|i| asset_name(i)}
         item
       end
       

@@ -27,8 +27,9 @@ module Compressible
         paths = args.dup
         options = paths.extract_options!
         to = asset_name(options[:to])
-        add_to_config(:js, to, paths)
+        add_to_config(:js, to, paths.flatten)
         write_javascript(*args) unless config[:read_only] == true
+        to
       end
       alias_method :add_javascript, :javascript
       alias_method :js, :javascript
@@ -37,8 +38,9 @@ module Compressible
         paths = args.dup
         options = paths.extract_options!
         to = asset_name(options[:to])
-        add_to_config(:css, to, paths)
+        add_to_config(:css, to, paths.flatten)
         write_stylesheet(*args) unless config[:read_only] == true
+        to
       end
       alias_method :add_stylesheet, :stylesheet
       alias_method :css, :stylesheet

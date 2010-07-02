@@ -5,7 +5,7 @@ require 'rake/gempackagetask'
 # http://docs.rubygems.org/read/chapter/20
 spec = Gem::Specification.new do |s|
   s.name              = "compressible"
-  s.version           = "0.0.2.3"
+  s.version           = "0.0.2.6"
   s.author            = "Lance Pollard"
   s.summary           = "Compressible: Quick asset compression for Ruby - Perfect for Heroku"
   s.homepage          = "http://github.com/viatropos/compressible"
@@ -16,7 +16,7 @@ spec = Gem::Specification.new do |s|
   s.platform          = Gem::Platform::RUBY
   s.files             = %w(README.markdown Rakefile init.rb MIT-LICENSE) + Dir["{lib,rails,test}/**/*"] - Dir["test/tmp"]
   s.require_path      = "lib"
-  s.add_dependency("activesupport", ">= 2.1.2")
+  s.add_dependency("activesupport", ">= 2.3.5")
   s.add_dependency("yui-compressor")
 end
 

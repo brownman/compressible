@@ -1,11 +1,7 @@
 require 'rubygems'
 require 'yaml'
-begin
-  gem "activesupport", "= 2.3.5"
-  require 'active_support'
-rescue Gem::LoadError => e
-  puts e.inspect
-end
+require 'active_support'
+
 this = File.dirname(__FILE__)
 require File.join(this, "ext.rb")
 
@@ -26,3 +22,7 @@ Compressible.send(:include, Compressible::Configurable)
 Compressible.send(:include, Compressible::Assetable)
 Compressible.send(:include, Compressible::Readable)
 Compressible.send(:include, Compressible::Writable)
+
+def Compressible(*args, &block)
+  Compressible.define!(*args, &block)
+end

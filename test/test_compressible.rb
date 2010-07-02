@@ -130,6 +130,34 @@ class CompressibleTest < Test::Unit::TestCase
       
     end
     
+    context "dsl" do
+      setup do
+        Compressible.reset
+        Compressible do
+          read_only
+          
+          javascripts do
+            result "test-a", "test-b"
+          end
+          
+          stylesheets do
+            result "test-a", "test-b"
+          end
+        end
+      end
+      
+      should "have defined the right js and css" do
+        result = {:js => [{:paths=>["test-a", "test-b"], :to=>"result"}],
+          :stylesheet_path=>nil,
+          :javascript_path=>nil,
+          :read_only=>true,
+          :css => [{:paths=>["test-a", "test-b"], :to=>"result"}]
+        }
+        assert_equal result, Compressible.config
+      end
+      
+      
+    end
     
   end
   
