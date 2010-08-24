@@ -7,39 +7,39 @@ module Compressible
     
     module ClassMethods
     
-      def javascripts(hash)
+      def javascripts(hash, &block)
         hash.each do |to, paths|
           paths << {:to => to}
-          javascript(*paths)
+          javascript(*paths, &block)
         end
       end
       alias_method :add_javascripts, :javascripts
 
-      def stylesheets(hash)
+      def stylesheets(hash, &block)
         hash.each do |to, paths|
           paths << {:to => to}
-          stylesheet(*paths)
+          stylesheet(*paths, &block)
         end
       end
       alias_method :add_stylesheets, :stylesheets
   
-      def javascript(*args)
-        paths = args.dup
+      def javascript(*args, &block)
+        paths = args.dup.flatten
         options = paths.extract_options!
         to = asset_name(options[:to])
-        add_to_config(:js, to, paths.flatten)
-        write_javascript(*args) unless config[:read_only] == true
+        add_to_config(:js, to, paths)
+        write_javascript(*args, &block) unless config[:read_only] == true
         to
       end
       alias_method :add_javascript, :javascript
       alias_method :js, :javascript
 
-      def stylesheet(*args)
-        paths = args.dup
+      def stylesheet(*args, &block)
+        paths = args.dup.flatten
         options = paths.extract_options!
         to = asset_name(options[:to])
-        add_to_config(:css, to, paths.flatten)
-        write_stylesheet(*args) unless config[:read_only] == true
+        add_to_config(:css, to, paths)
+        write_stylesheet(*args, &block) unless config[:read_only] == true
         to
       end
       alias_method :add_stylesheet, :stylesheet

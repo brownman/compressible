@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'yaml'
+require 'open-uri'
 require 'active_support'
+require 'active_support/core_ext'
 
 this = File.dirname(__FILE__)
 require File.join(this, "ext.rb")

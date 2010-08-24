@@ -14,6 +14,23 @@ module Compressible
       Compressible.configure(:read_only => value)
     end
     
+    def stylesheet_path(value)
+      Compressible.configure(:stylesheet_path => value)
+    end
+    
+    def javascript_path(value)
+      Compressible.configure(:javascript_path => value)
+    end
+    
+    # used to customize the output
+    def format(context = nil, &block)
+      if block_given?
+        context ||= @context
+        @format ||= {}
+        @format[context] = block
+      end
+    end
+    
     def stylesheets(&block)
       @context = "stylesheet"
       instance_eval(&block) if block_given?
@@ -28,10 +45,20 @@ module Compressible
     
     def method_missing(meth, *args, &block)
       if @context
-        Compressible.send(@context, args, :to => [meth])
+        Compressible.send(@context, args, :to => [meth]) do |name, output|
+          modify(name, output)
+        end
       else
         super(meth, *args, &block)
       end
+    end
+    
+    protected
+    def modify(name, output)
+      if @format
+        return @format[@context].call(name, output) if @format[@context]
+      end
+      output
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'yui/compressor'
-
+raise 'stop'
 namespace :compress do
   
   desc "Compress JS"

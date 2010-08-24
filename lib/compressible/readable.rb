@@ -13,17 +13,17 @@ module Compressible
       def uncached_javascript_paths(*keys)
         uncached_paths_for(:js, *keys)
       end
-
+      
       def uncached_paths_for(type, *keys)
-        returning [] do |result|
-          config[type].each do |item|
-            keys.each do |key|
-              result.concat(item[:paths]) if item[:to] == key.to_s
-            end
+        result = []
+        config[type].each do |item|
+          keys.each do |key|
+            result.concat(item[:paths]) if item[:to] == key.to_s
           end
         end
+        result.flatten
       end
-
+      
       def stylesheets_for(*keys)
         assets_for(:stylesheet, *keys)
       end
@@ -34,12 +34,21 @@ module Compressible
 
       def assets_for(type, *keys)
         options = keys.extract_options!
-        environment = defined?(Rails) ? Rails.env.to_s : (options[:current] || "production")
-        environment = environment.to_s
+        keys.map!(&:to_s)
+        if !options[:current].blank?
+          environment = options[:current].to_s
+        elsif defined?(::Rails)
+          environment = Rails.env.to_s
+        elsif defined?(::Sinatra::Application)
+          environment = Sinatra::Application.environment.to_s
+        else
+          environment = "production"
+        end
+        puts "ENV #{environment}"
         cache_environments = options[:environments] || "production"
         cache_environments = [cache_environments] unless cache_environments.is_a?(Array)
         cache_environments = cache_environments.collect(&:to_s)
-
+        
         assets = cache_environments.include?(environment) ? keys : send("uncached_#{type.to_s}_paths", *keys)
         assets
       end
@@ -60,6 +69,9 @@ module Compressible
 
         if config && config[key]
           path = File.join(config[key], file.to_s)
+          
+        elsif remote?(file)
+          path = file.to_s
         elsif defined?(Rails)
           path = File.join(Rails.root.to_s, "public/#{type.to_s.pluralize}", file.to_s)
         else
@@ -86,7 +98,11 @@ module Compressible
       end
       
       def read(type, from)
-        IO.read(path_for(type, from))
+        open(path_for(type, from)).read
+      end
+      
+      def remote?(path)
+        !!(path =~ /^http(?:s)?/)
       end
     end
     

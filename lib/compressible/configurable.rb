@@ -34,7 +34,7 @@ module Compressible
           :read_only => false
         }
       end
-
+      
       def config
         @config ||= defaults
       end
