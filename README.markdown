@@ -4,22 +4,15 @@
 
 Built in pure Ruby.  Integrates perfectly into Rails, Sinatra, Rack, and anything else.  Perfect for Heroku.  Used in several large production Heroku apps already.
 
-- [Install](#install)
-- [Configure](#configure)
-  - [DSL](#dsl)
-  - [YAML](#yaml)
-- [Scraping](#scraping)
-- [Views](#views)
-
-<h2 id='install'>Install</h2>
+## Install
 
     sudo gem install compressible
 
-<h2 id='configure'>Configure</h2>
+## Configuration
 
 You can configure this using a DSL, YAML, or plain ruby methods.
 
-<h3 id='dsl'>1. DSL</h3>
+### 1. DSL
 
     Compressible do
       read_only true
@@ -71,7 +64,7 @@ Here is some sample output from a real page:
     window.PR_SHOULD_USE_CONTINUATION=true;window.PR_TAB_WIDTH=8;window.PR_normalizedHtml=wind...
     ...
 
-<h3 id='yaml'>2. YAML</h3>
+### 2. YAML
 
 You can also just use YAML.
 
@@ -101,7 +94,7 @@ You can then setup everything with `configure`:
 
     Compressible.configure("config/compressible.yml") # or pass it the yaml hash
 
-<h2 id='scraping'>Scraping</h2>
+## Scraping
 
 Compressible also has a method to parse out the javascripts and stylesheets from an HTML page.  This requires Nokogiri (the rest of the library doesn't use Nokogiri).  You'd use this if you want to say scrape the assets from your Sinatra app, and compress them, rather than having to copy/paste your `javascript_include_tag` declarations elsewhere:
 
@@ -139,7 +132,7 @@ You can use this to create a simple pre-deploy Rake task for asset compression:
       end
     end
 
-<h2 id='views'>Views</h2>
+## Views
 
 Add this to your views:
 
