@@ -1,8 +1,8 @@
 # Compressible
 
-> Ready-to-go Asset Compression for Ruby, perfect for Heroku, using the YUICompressor.
-    
-# Usage
+> Ready-to-go Asset Compression for Ruby using the YUICompressor.
+
+Built in pure Ruby.  Integrates perfectly into Rails, Sinatra, Rack, and anything else.  Perfect for Heroku.  Used in several large production Heroku apps already.
 
 ## Install
 
@@ -22,6 +22,7 @@ You can configure this using a DSL, YAML, or plain ruby methods.
       stylesheets do
         result "test-a", "test-b"
       end
+      
       javascripts do
         send "application-cache", *javascripts do |name, output|
           result = "// #{name}\n"
@@ -61,20 +62,7 @@ Here is some sample output from a real page:
     jQuery(function(i){var f=i("meta[name=csrf-token]").attr("content"),h=i("meta[name=csrf-pa...
     // http://cachedcommons.org/javascripts/text/prettify-min.js                              
     window.PR_SHOULD_USE_CONTINUATION=true;window.PR_TAB_WIDTH=8;window.PR_normalizedHtml=wind...
-    // http://cachedcommons.org/javascripts/text/showdown-min.js                              
-    var Attacklab=Attacklab||{};Attacklab.showdown=Attacklab.showdown||{};Attacklab.showdown.c...
-    // http://cachedcommons.org/javascripts/jquery/jquery.superfish-1.4.8.js                  
-    (function(b){b.fn.superfish=function(k){var g=b.fn.superfish,j=g.c,f=b(['<span class="',j....
-    // cufon-yui                                                                              
-    var Cufon=(function(){var P=function(){return P.replace.apply(null,arguments)};var D=P.DOM...
-    // Vegur_300-Vegur_700.font                                                               
-    Cufon.registerFont({w:184,face:{"font-family":"Vegur","font-weight":300,"font-stretch":"no...
-    // jquery.mixpanel                                                                        
-    var mpmetrics=null;(function(a){a.mixpanel={setup:function(e,c){var d=(("https:"==document...
-    // jquery.disqus                                                                          
-    (function(a){a.fn.disqus=function(b){var b=a.extend({domain:"",title:"",message:"",url:win...
-    // application                                                                            
-    Cufon.replace(".logo span, h1, h2, h3, h4 , h5, h6, .learnmore, .fresh_button, .comment-re...
+    ...
 
 ### 2. YAML
 
@@ -195,5 +183,13 @@ Some libraries solve this by patching `asset_packager` to redirect css/js urls t
 The best possible way to manage your production assets is to have everything completely static, minimized, and gzipped.  This means no passing through Rack, no redirects, no inline X.  Then whenever you deploy, you run it through Compressible and it will optimize your development assets for production.
 
 As such, Compressible compresses all assets before you push to Heroku, so a) you never write to the Heroku file system, and b) you don't have slow down the request with application or middleware layers.
+
+## Resources
+
+- [http://scoop.simplyexcited.co.uk/2009/11/24/yui-compressor-vs-google-closure-compiler-for-javascript-compression/](http://scoop.simplyexcited.co.uk/2009/11/24/yui-compressor-vs-google-closure-compiler-for-javascript-compression/)
+
+### Alternatives
+
+- [AssetPackager](http://github.com/sbecker/asset_packager): Needs patch to work on Heroku. Uses something other than YUICompressor and Google Closure.
 
 <cite>copyright [@viatropos](http://viatropos.com) 2010</cite>
