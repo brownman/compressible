@@ -157,6 +157,35 @@ To tell it you want to use the cached in a different environment, you can specif
 
     compressible_stylesheet_tag "production_cache", :environments => ["production", "staging"], :current => "development"
 
+## API
+
+These are all the methods/options you can use in Compressible:
+
+#### 1. The Compressible block for complete configuration
+
+    Compressible do ...
+    
+#### 2. Or directly fill the `config` hash
+
+    Compressible.configure(hash or path/to.yml)
+    
+#### 3. Or fill the `config` hash with only javascript or css (just adds to the `config` hash)
+    
+    Compressible.js # aliased with `Compressible.javascripts`
+    Compressible.css # aliased with `Compressible.stylesheets`
+
+#### 4. Clear the config hash
+
+    Compressible.reset
+    
+#### 5. Scrape assets from a page
+
+    Compressible.scrape(path) #=> {:js => [], :css => []}
+    
+#### Read-Only
+
+If the `read_only` config option is `true`, then it won't try to write (aka compress) the assets.  Use this during development mode, so when you startup your Rails/Sinatra app, Compressible doesn't spend time downloading and compressing the assets.  When you deploy, set `read_only = false`, so that it will download and compress the assets.
+
 ## Awesome Assets for Heroku
 
 Because Heroku is a Read-Only file system, you can't use Rails' built in asset cacher, or libraries like `asset_packager`.  They rely on the ability to write to the file system in the production environment.

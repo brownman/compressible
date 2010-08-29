@@ -65,7 +65,7 @@ class Compressible
         
         write(type, to, compressed)
         
-        #destroy
+        destroy
         
         end_size = size(type, to)
         
