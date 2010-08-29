@@ -25,7 +25,7 @@ You can configure this using a DSL, YAML, or plain ruby methods.
       
       javascripts do
         send "application-cache", *javascripts do |name, output|
-          result = "// #{name}\n"
+          result = "/* #{name} */\n"
           result << output
           result << "\n"
           result
@@ -39,28 +39,28 @@ The block `do |name, output|` is optional, but it allows you to post-process the
 
 ... with the code from the above block, we can output it like this:
     
-    // lib1
+    /* lib1 */
     (function() {lib1}...)
-    // lib2
+    /* lib2 */
     (function() {lib2})...
 
 Here is some sample output from a real page:
 
-    // http://cachedcommons.org/javascripts/jquery/jquery.google-analytics-1.1.3-min.js
+    /* http://cachedcommons.org/javascripts/jquery/jquery.google-analytics-1.1.3-min.js */
     (function(f){var d;f.trackPage=function(c,m){var b=(("https:"==document.location.protocol)...
-    // http://cachedcommons.org/javascripts/jquery/jquery.system-0.1.1-min.js                 
+    /* http://cachedcommons.org/javascripts/jquery/jquery.system-0.1.1-min.js                  */
     (function(b){b.system={browser:{safari:false,firefox:false,ie:false,opera:false,chrome:fal...
-    // http://cachedcommons.org/javascripts/jquery/jquery.form-2.4.3-min.js                   
+    /* http://cachedcommons.org/javascripts/jquery/jquery.form-2.4.3-min.js                    */
     (function(c){c.fn.ajaxSubmit=function(D){if(!this.length){d("ajaxSubmit: skipping submit p...
-    // http://cachedcommons.org/javascripts/jquery/jquery.hoverIntent-min.js                  
+    /* http://cachedcommons.org/javascripts/jquery/jquery.hoverIntent-min.js                   */
     (function(a){a.fn.hoverIntent=function(k,j){var l={sensitivity:7,interval:100,timeout:0};l...
-    // http://cachedcommons.org/javascripts/jquery/jquery.cycle.all-2.8.6-min.js              
+    /* http://cachedcommons.org/javascripts/jquery/jquery.cycle.all-2.8.6-min.js               */
     (function(y){var v="2.86";if(y.support==undefined){y.support={opacity:!(y.browser.msie)}}f...
-    // http://cachedcommons.org/javascripts/jquery/jquery.validate-1.7-min.js                 
+    /* http://cachedcommons.org/javascripts/jquery/jquery.validate-1.7-min.js                  */
     eval(function(h,b,i,d,g,f){g=function(a){return(a<b?"":g(parseInt(a/b)))+((a=a%b)>35?Strin...
-    // http://cachedcommons.org/javascripts/jquery/jquery.rails-min.js                        
+    /* http://cachedcommons.org/javascripts/jquery/jquery.rails-min.js                         */
     jQuery(function(i){var f=i("meta[name=csrf-token]").attr("content"),h=i("meta[name=csrf-pa...
-    // http://cachedcommons.org/javascripts/text/prettify-min.js                              
+    /* http://cachedcommons.org/javascripts/text/prettify-min.js                               */
     window.PR_SHOULD_USE_CONTINUATION=true;window.PR_TAB_WIDTH=8;window.PR_normalizedHtml=wind...
     ...
 
@@ -114,7 +114,7 @@ You can use this to create a simple pre-deploy Rake task for asset compression:
         
         javascripts do
           send "application-cache", *assets[:js] do |name, output|
-            result = "// #{name}\n"
+            result = "/* #{name} */\n"
             result << output
             result << "\n"
             result
@@ -123,7 +123,7 @@ You can use this to create a simple pre-deploy Rake task for asset compression:
         
         stylesheets do
           send "application-cache", *assets[:css] do |name, output|
-            result = "// #{name}\n"
+            result = "/* #{name} */\n"
             result << output
             result << "\n"
             result
