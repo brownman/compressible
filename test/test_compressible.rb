@@ -1,9 +1,8 @@
 require File.join(File.dirname(__FILE__), "test_helper")
 
-class CompressibleTest < Test::Unit::TestCase
+class CompressibleTest < ActiveSupport::TestCase
   
   context "Compressible" do
-    
     context "configuration" do
             
       should "load configuration file and result should be a Module" do
@@ -156,9 +155,80 @@ class CompressibleTest < Test::Unit::TestCase
         assert_equal result, Compressible.config
       end
       
+    end
+
+    context "remote" do
+      setup do
+        Compressible.reset
+        Compressible do
+          read_only false
+          stylesheet_path "test"
+          javascript_path "test"
+          
+          javascripts do
+            result "test-a", "test-b", "http://cachedcommons.org/javascripts/jquery/jquery.cookie.js" do |name, output|
+              result = "// #{name}\n"
+              result << output
+              result << "\n"
+              result
+            end
+          end
+          
+          stylesheets do
+            result "test-a", "test-b", "http://cachedcommons.org/stylesheets/jquery/jquery.prettyPhoto.css"
+          end
+        end
+      end
+      
+      should "have defined the right js and css" do
+        result = {:js => [{:paths => ["test-a", "test-b", "http://cachedcommons.org/javascripts/jquery/jquery.cookie"], :to => "result"}],
+          :stylesheet_path => "test",
+          :javascript_path => "test",
+          :read_only => false,
+          :css => [{:paths => ["test-a", "test-b", "http://cachedcommons.org/stylesheets/jquery/jquery.prettyPhoto"], :to => "result"}]
+        }
+        assert_equal result, Compressible.config
+        assert_equal false, File.exists?(Compressible.tmp)
+      end
       
     end
-    
+
+    context "scrape" do
+      setup do
+        @hash = Compressible.scrape("./test/page.html")
+      end
+      
+      should "have defined the right js and css" do
+        desired = {
+          :js => [
+            "http://viatropos.com/javascripts/redirect.js", 
+            "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery-1.4.2-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.google-analytics-1.1.3-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.system-0.1.1-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.form-2.4.3-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.hoverIntent-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.cycle.all-2.8.6-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.validate-1.7-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.rails-min.js", 
+            "http://cachedcommons.org/javascripts/text/prettify-min.js", 
+            "http://cachedcommons.org/javascripts/text/showdown-min.js", 
+            "http://cachedcommons.org/javascripts/jquery/jquery.superfish-1.4.8.js", 
+            "http://viatropos.com/javascripts/cufon-yui.js", 
+            "http://viatropos.com/javascripts/Vegur_300-Vegur_700.font.js", 
+            "http://viatropos.com/javascripts/jquery.mixpanel.js", 
+            "http://viatropos.com/javascripts/jquery.disqus.js", 
+            "http://viatropos.com/javascripts/application.js"
+          ],
+          :css => [
+            "http://viatropos.com/stylesheets/application.css",
+            "http://cachedcommons.org/stylesheets/jquery/jquery.prettyPhoto.css"
+          ]
+        }
+        assert_equal desired, @hash
+      end
+    end
+
   end
   
 end

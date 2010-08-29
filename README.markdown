@@ -1,61 +1,84 @@
 # Compressible
 
-Ready-to-go Asset Compression for Ruby, using the YUICompressor.
-
-    sudo gem install compressible
+> Ready-to-go Asset Compression for Ruby, perfect for Heroku, using the YUICompressor.
     
 # Usage
 
+## Install
+
+    sudo gem install compressible
+
 ## Configuration
 
-There are a few ways you can configure this
+You can configure this using a DSL, YAML, or plain ruby methods.
 
-### 1. Initializers
+### 1. DSL
 
-Inside an initializer such as `config/compressible.rb`:
-
-    Compressible.stylesheets(
-      :production_cache => %w(reset background footer list),
-      :typography => %w(forms headers basic_text)
-    )
-    Compressible.javascripts(
-      :production_cache => %w(animations effects dragdrop)
-    )
+    Compressible do
+      read_only true
+      stylesheet_path "stylesheets"
+      javascript_path "javascripts"
+      
+      stylesheets do
+        result "test-a", "test-b"
+      end
+      javascripts do
+        send "application-cache", *javascripts do |name, output|
+          result = "// #{name}\n"
+          result << output
+          result << "\n"
+          result
+        end
+      end
+    end
     
-    # or
-    Compressible.assets(
-      :stylesheets => {
-        :production_cache => %w(reset background footer list),
-        :typography => %w(forms headers basic_text)
-      }
-      :javascripts => {
-        :production_cache => %w(animations effects dragdrop)
-      }
-    )
+The block `do |name, output|` is optional, but it allows you to post-process the compressed output.  This is nice b/c it gives you space to add comments and whatnot.  So instead of 10 js libraries being packed together like this (pseudo code):
+
+    (function() {lib1}...)(function() {lib2})...
+
+... with the code from the above block, we can output it like this:
     
-    # or one at a time
-    Compressible.stylesheet(
-      :production_cache => %w(reset background footer list)
-    )
-    Compressible.stylesheet(
-      :typography => %w(forms headers basic_text)
-    )
+    // lib1
+    (function() {lib1}...)
+    // lib2
+    (function() {lib2})...
 
-Each of those methods have plenty of aliases to be more descriptive and more concise, respectively:
+Here is some sample output from a real page:
 
-- `stylesheets`: `add_stylesheets`
-- `javascripts`: `add_javascripts`
-- `stylesheet`: `add_stylesheet`, `css`
-- `javascript`: `add_javascript`, `js`
+    // http://cachedcommons.org/javascripts/jquery/jquery.google-analytics-1.1.3-min.js
+    (function(f){var d;f.trackPage=function(c,m){var b=(("https:"==document.location.protocol)...
+    // http://cachedcommons.org/javascripts/jquery/jquery.system-0.1.1-min.js                 
+    (function(b){b.system={browser:{safari:false,firefox:false,ie:false,opera:false,chrome:fal...
+    // http://cachedcommons.org/javascripts/jquery/jquery.form-2.4.3-min.js                   
+    (function(c){c.fn.ajaxSubmit=function(D){if(!this.length){d("ajaxSubmit: skipping submit p...
+    // http://cachedcommons.org/javascripts/jquery/jquery.hoverIntent-min.js                  
+    (function(a){a.fn.hoverIntent=function(k,j){var l={sensitivity:7,interval:100,timeout:0};l...
+    // http://cachedcommons.org/javascripts/jquery/jquery.cycle.all-2.8.6-min.js              
+    (function(y){var v="2.86";if(y.support==undefined){y.support={opacity:!(y.browser.msie)}}f...
+    // http://cachedcommons.org/javascripts/jquery/jquery.validate-1.7-min.js                 
+    eval(function(h,b,i,d,g,f){g=function(a){return(a<b?"":g(parseInt(a/b)))+((a=a%b)>35?Strin...
+    // http://cachedcommons.org/javascripts/jquery/jquery.rails-min.js                        
+    jQuery(function(i){var f=i("meta[name=csrf-token]").attr("content"),h=i("meta[name=csrf-pa...
+    // http://cachedcommons.org/javascripts/text/prettify-min.js                              
+    window.PR_SHOULD_USE_CONTINUATION=true;window.PR_TAB_WIDTH=8;window.PR_normalizedHtml=wind...
+    // http://cachedcommons.org/javascripts/text/showdown-min.js                              
+    var Attacklab=Attacklab||{};Attacklab.showdown=Attacklab.showdown||{};Attacklab.showdown.c...
+    // http://cachedcommons.org/javascripts/jquery/jquery.superfish-1.4.8.js                  
+    (function(b){b.fn.superfish=function(k){var g=b.fn.superfish,j=g.c,f=b(['<span class="',j....
+    // cufon-yui                                                                              
+    var Cufon=(function(){var P=function(){return P.replace.apply(null,arguments)};var D=P.DOM...
+    // Vegur_300-Vegur_700.font                                                               
+    Cufon.registerFont({w:184,face:{"font-family":"Vegur","font-weight":300,"font-stretch":"no...
+    // jquery.mixpanel                                                                        
+    var mpmetrics=null;(function(a){a.mixpanel={setup:function(e,c){var d=(("https:"==document...
+    // jquery.disqus                                                                          
+    (function(a){a.fn.disqus=function(b){var b=a.extend({domain:"",title:"",message:"",url:win...
+    // application                                                                            
+    Cufon.replace(".logo span, h1, h2, h3, h4 , h5, h6, .learnmore, .fresh_button, .comment-re...
 
-Or you can call them generically:
+### 2. YAML
 
-    Compressible.assets(:stylesheet)
-    Compressible.assets(:javascript)
-    
-### 2. Yaml
-
-You can specify these same configuration options using Yaml:
+You can also just use YAML.
 
     js:
       paths:
@@ -82,7 +105,45 @@ You can specify these same configuration options using Yaml:
 You can then setup everything with `configure`:
 
     Compressible.configure("config/compressible.yml") # or pass it the yaml hash
+
+## Scraping
+
+Compressible also has a method to parse out the javascripts and stylesheets from an HTML page.  This requires Nokogiri (the rest of the library doesn't use Nokogiri).  You'd use this if you want to say scrape the assets from your Sinatra app, and compress them, rather than having to copy/paste your `javascript_include_tag` declarations elsewhere:
+
+    assets = Compressible.scrape("http://localhost:4567/")
+    assets[:js] #=> ["http://localhost:4567/javascripts/application.js", ...]
+    assets[:css] #=> ["http://localhost:4567/stylesheets/application.css", ...]
     
+You can use this to create a simple pre-deploy Rake task for asset compression:
+
+    task :compress do
+      assets = Compressible.scrape("http://localhost:4567")
+      
+      Compressible do
+        read_only false
+        javascript_path "javascripts"
+        stylesheet_path "stylesheets"
+        
+        javascripts do
+          send "application-cache", *assets[:js] do |name, output|
+            result = "// #{name}\n"
+            result << output
+            result << "\n"
+            result
+          end
+        end
+        
+        stylesheets do
+          send "application-cache", *assets[:css] do |name, output|
+            result = "// #{name}\n"
+            result << output
+            result << "\n"
+            result
+          end
+        end
+      end
+    end
+
 ## Views
 
 Add this to your views:
@@ -90,11 +151,11 @@ Add this to your views:
     compressible_stylesheet_tag "production_cache", "typography"
     compressible_javascript_tag "production_cache"
 
-By default, it will use non-compressed stylesheets when `Rails.env == "development"`, and the compressed stylesheets when `Rails.env == "production"`.
+By default, it will use non-compressed stylesheets when `Rails.env == "development"` or `Sinatra::Application.environment == "development"`, and the compressed stylesheets when  the environment is `"production"`.
 
 To tell it you want to use the cached in a different environment, you can specify it like this:
 
-    compressible_stylesheet_tag "production_cache", :environments => ["production", "staging"]
+    compressible_stylesheet_tag "production_cache", :environments => ["production", "staging"], :current => "development"
 
 ## Awesome Assets for Heroku
 
@@ -102,32 +163,8 @@ Because Heroku is a Read-Only file system, you can't use Rails' built in asset c
 
 Some libraries solve this by patching `asset_packager` to redirect css/js urls to the `/tmp` directory using Rack middleware.  The `/tmp` directory is about the only place Heroku lets you write to the file system in.  The main issue with this approach is that all requests for stylesheets and javascripts must pass through Rack, which potentially _doubles_ response time.  Take a look at the [asset loading performance comparison with different Ruby stacks](http://www.ridingtheclutch.com/2009/07/13/the-ultimate-ruby-performance-test-part-1.html).
 
-As such, Compressible compresses all assets before you push to Heroku, so a) you never write to the Heroku file system, and b) you don't have slow down the request with application or middleware layers.  It does this with _git hooks_.  Every time you commit, a `pre-commit` hook runs which re-compresses your assets.  That means whenever you push, your assets are ready for production.
+The best possible way to manage your production assets is to have everything completely static, minimized, and gzipped.  This means no passing through Rack, no redirects, no inline X.  Then whenever you deploy, you run it through Compressible and it will optimize your development assets for production.
 
-This is configurable.  It relies on the [`hookify`](http://github.com/viatropos/hookify) gem.
+As such, Compressible compresses all assets before you push to Heroku, so a) you never write to the Heroku file system, and b) you don't have slow down the request with application or middleware layers.
 
-    sudo gem install hookify
-    cd my-rails-app
-    hookify pre-commit
-    mate config/hooks/pre_commit.rb
-    
-That creates a ruby script for you were you can define what you want to run when.  Add this to the `config/hooks/pre_commit.rg` file:
-
-    require 'rubygems'
-    gem "activesupport", "= 2.3.5"
-    require "active_support"
-    require 'compressible'
-
-    Compressible.configure(
-      :stylesheet_path => "public/stylesheets",
-      :javascript_path => "public/javascripts"
-    )
-
-    Compressible.stylesheets(
-      :production_cache => %w(reset background footer list)
-    )
-    Compressible.javascripts(
-      :production_cache => %w(interface jquery.anytime)
-    )
-    
-Now stylesheets and javascripts compress using the YUICompressor every time you commit.  And it's fast.  Very cool.
+<cite>copyright [@viatropos](http://viatropos.com) 2010</cite>

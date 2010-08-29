@@ -1,4 +1,4 @@
-module Compressible
+class Compressible
   module Assetable
     
     def self.included(base)

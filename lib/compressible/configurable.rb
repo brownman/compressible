@@ -1,4 +1,4 @@
-module Compressible
+class Compressible
   module Configurable
     
     def self.included(base)
@@ -7,6 +7,10 @@ module Compressible
     
     module ClassMethods
       attr_reader :config
+      
+      def tmp
+        "./.compressible"
+      end
 
       def configure(value = nil)
         raise "invalid config" unless (value.is_a?(String) || value.is_a?(Hash))

@@ -1,4 +1,4 @@
-module Compressible
+class Compressible
   class Builder
     class << self
       def define!(*args, &block)
@@ -45,6 +45,7 @@ module Compressible
     
     def method_missing(meth, *args, &block)
       if @context
+        format(@context, &block)
         Compressible.send(@context, args, :to => [meth]) do |name, output|
           modify(name, output)
         end

@@ -1,4 +1,4 @@
-module Compressible
+class Compressible
   module Readable
     
     def self.included(base)
@@ -44,7 +44,7 @@ module Compressible
         else
           environment = "production"
         end
-        puts "ENV #{environment}"
+        
         cache_environments = options[:environments] || "production"
         cache_environments = [cache_environments] unless cache_environments.is_a?(Array)
         cache_environments = cache_environments.collect(&:to_s)
@@ -67,11 +67,12 @@ module Compressible
       def path_for(type, file)
         key = "#{type.to_s}_path".to_sym
 
-        if config && config[key]
-          path = File.join(config[key], file.to_s)
-          
+        if file =~ /\.\/\.compressible/
+          path = file.to_s
         elsif remote?(file)
           path = file.to_s
+        elsif config && config[key]
+          path = File.join(config[key], file.to_s)
         elsif defined?(Rails)
           path = File.join(Rails.root.to_s, "public/#{type.to_s.pluralize}", file.to_s)
         else
@@ -99,10 +100,6 @@ module Compressible
       
       def read(type, from)
         open(path_for(type, from)).read
-      end
-      
-      def remote?(path)
-        !!(path =~ /^http(?:s)?/)
       end
     end
     
